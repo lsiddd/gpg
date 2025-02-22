@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>John Doe - GPG Key</title>
+    <title>Lucas Pacheco (lsiddd) - GPG Key</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/openpgp@5.0.0/dist/openpgp.min.js"></script>
     <style>
         :root {
             --primary: #2F80ED;
@@ -29,11 +30,39 @@
             margin: 0 auto;
         }
 
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+        }
+
+        .bio {
+            flex: 1;
+        }
+
         h1 {
-            font-size: 2.5rem;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .social-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
             margin-bottom: 2rem;
-            font-weight: 600;
-            color: var(--primary);
+        }
+
+        .social-item {
+            padding: 1rem;
+            background: #F8F9FA;
+            border-radius: 6px;
         }
 
         .section {
@@ -44,12 +73,6 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
-        h2 {
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
-            color: var(--primary);
-        }
-
         .gpg-key {
             background: #F8F9FA;
             padding: 1rem;
@@ -58,11 +81,10 @@
             white-space: pre-wrap;
             word-wrap: break-word;
             overflow-x: auto;
-            margin-bottom: 1rem;
             position: relative;
         }
 
-        button, .button {
+        button {
             background: var(--primary);
             color: white;
             border: none;
@@ -73,7 +95,7 @@
             transition: opacity 0.2s;
         }
 
-        button:hover, .button:hover {
+        button:hover {
             opacity: 0.9;
         }
 
@@ -109,26 +131,49 @@
             top: 0.5rem;
             right: 0.5rem;
             padding: 0.5rem 1rem;
-            font-size: 0.875rem;
         }
     </style>
 </head>
 <body>
-    <h1>John Doe</h1>
-    
+    <div class="profile-header">
+        <!-- <img src="https://avatars.githubusercontent.com/u/USER_ID?v=4" alt="Avatar" class="avatar"> -->
+        <div class="bio">
+            <h1>Lucas Pacheco</h1>
+            <p>PhD candidate @ University of Bern • Linux enthusiast • C++ developer • Network security researcher</p>
+        </div>
+    </div>
+
+    <div class="social-info">
+        <div class="social-item">
+            <strong>🌐 Website</strong>
+            <p><a href="https://lsiddd.github.io">lsiddd.github.io</a></p>
+        </div>
+        <div class="social-item">
+            <strong>👨💻 GitHub</strong>
+            <p><a href="https://github.com/lsiddd">github.com/lsiddd</a></p>
+        </div>
+    </div>
+
     <div class="section">
         <h2>PGP Public Key</h2>
         <div class="gpg-key-container">
             <div class="gpg-key" id="gpg-key">
                 -----BEGIN PGP PUBLIC KEY BLOCK-----
-                
-                [YOUR PUBLIC KEY HERE]
-                
+
+                mDMEZ7nDJhYJKwYBBAHaRw8BAQdA8MT1zGeqGHRr2Srh/3V6xYYn59tl9ZCDkmLa
+                pIDXS2i0H2x1Y2FzcCA8bHVjYXMucGFjaGVjb0B1bmliZS5jaD6ImQQTFgoAQRYh
+                BP0UNCiUQnlOJqtvXTHY646tEdwDBQJnucMmAhsDBQkFo73KBQsJCAcCAiICBhUK
+                CQgLAgQWAgMBAh4HAheAAAoJEDHY646tEdwDXyEBAPkG+zpv0V9mDqXBqSxfB5vz
+                HdqNedgbEVo39juVM1tjAQCHizQpcKfteQ2zw3oOO6tR/0PmUR3fZn+uwDXKCqLt
+                A7g4BGe5wyYSCisGAQQBl1UBBQEBB0BVARVsWJXVzGBQa6zdQNyIikucKOAetf/f
+                WFj2d829ZAMBCAeIfgQYFgoAJhYhBP0UNCiUQnlOJqtvXTHY646tEdwDBQJnucMm
+                AhsMBQkFo73KAAoJEDHY646tEdwDjIkBAPSAxpkubFBz7ZcxZGt7rWGeEWybL+I0
+                ryV6FxwBdjPhAQCCA0M6VQnj/vAaZmUn71yKANT7dw6xLjFKoUVZUzJMAQ==
+                =j94E
                 -----END PGP PUBLIC KEY BLOCK-----
             </div>
             <button class="copy-btn" onclick="copyKey()">Copy Key</button>
         </div>
-        <p>This key is also available on <a href="https://keys.openpgp.org" target="_blank">keys.openpgp.org</a></p>
     </div>
 
     <div class="section">
@@ -140,7 +185,7 @@
             </div>
             <div>
                 <label for="signature">Signature:</label>
-                <textarea id="signature" placeholder="Paste signature here..."></textarea>
+                <textarea id="signature" placeholder="Paste ASCII-armored signature here..."></textarea>
             </div>
             <button type="submit">Verify Signature</button>
         </form>
@@ -148,33 +193,24 @@
     </div>
 
     <script>
-        function copyKey() {
-            const key = document.getElementById('gpg-key');
-            const range = document.createRange();
-            range.selectNode(key);
-            window.getSelection().removeAllRanges();
-            window.getSelection().addRange(range);
-            document.execCommand('copy');
-            window.getSelection().removeAllRanges();
-            alert('Public key copied to clipboard!');
-        }
-
         async function verifySignature(event) {
             event.preventDefault();
             const message = document.getElementById('message').value;
             const signature = document.getElementById('signature').value;
+            const publicKeyArmored = document.getElementById('gpg-key').textContent.trim();
             const resultDiv = document.getElementById('result');
 
-            // Replace with actual verification logic
-            // This is a placeholder implementation
             try {
-                // In real implementation, use OpenPGP.js or similar library
-                // to verify the signature against the public key
-                const isValid = confirm(`Would you like to simulate a successful verification? 
-                    Click OK for success, Cancel for failure.`);
+                const publicKey = await openpgp.readKey({ armoredKey: publicKeyArmored });
+                const verified = await openpgp.verify({
+                    message: await openpgp.createMessage({ text: message }),
+                    signature: await openpgp.readSignature({ armoredSignature: signature }),
+                    verificationKeys: publicKey
+                });
 
-                resultDiv.className = 'result ' + (isValid ? 'success' : 'error');
-                resultDiv.textContent = isValid ? 
+                const { valid } = verified.signatures[0];
+                resultDiv.className = 'result ' + (valid ? 'success' : 'error');
+                resultDiv.textContent = valid ? 
                     '✓ Signature is valid' : 
                     '✗ Signature is invalid';
                 resultDiv.style.display = 'block';
@@ -183,6 +219,13 @@
                 resultDiv.textContent = 'Error: ' + error.message;
                 resultDiv.style.display = 'block';
             }
+        }
+
+        function copyKey() {
+            const key = document.getElementById('gpg-key');
+            navigator.clipboard.writeText(key.textContent.trim())
+                .then(() => alert('Public key copied to clipboard!'))
+                .catch(err => alert('Failed to copy key: ' + err));
         }
     </script>
 </body>
